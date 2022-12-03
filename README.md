@@ -12,4 +12,4 @@ Trying out zig this time. Still not gonna finish.
 ## Running
 
 - Download input for the day with `./scripts/download-input.sh <day number>`
-- Run desired day and part with `zig build run -- <day day number> <part number>`
+- Run desired day and part with `zig build run -- <day number> <part number>`
