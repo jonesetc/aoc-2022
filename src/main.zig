@@ -4,6 +4,7 @@ const day0 = @import("day0.zig");
 const day1 = @import("day1.zig");
 const day2 = @import("day2.zig");
 const day3 = @import("day3.zig");
+const day4 = @import("day4.zig");
 
 const AocExcercise = struct { day: u8, part: u8 };
 const AocError = error{InvalidUsage};
@@ -49,6 +50,11 @@ pub fn main() !void {
         3 => switch (exercise.part) {
             1 => day3.allocPart1(allocator, input),
             2 => day3.allocPart2(allocator, input),
+            else => unreachable,
+        },
+        4 => switch (exercise.part) {
+            1 => day4.allocPart1(allocator, input),
+            2 => day4.allocPart2(allocator, input),
             else => unreachable,
         },
         else => {
