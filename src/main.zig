@@ -1,8 +1,5 @@
 const std = @import("std");
 
-const AocExcercise = struct { day: u8, part: u8 };
-const AocError = error{InvalidUsage};
-
 const exercises = std.ComptimeStringMap(*const fn (std.mem.Allocator, []const u8) anyerror![]const u8, .{
     .{ "0 1", @import("day0.zig").allocPart1 },
     .{ "0 2", @import("day0.zig").allocPart2 },
@@ -14,6 +11,8 @@ const exercises = std.ComptimeStringMap(*const fn (std.mem.Allocator, []const u8
     .{ "3 2", @import("day3.zig").allocPart2 },
     .{ "4 1", @import("day4.zig").allocPart1 },
     .{ "4 2", @import("day4.zig").allocPart2 },
+    .{ "5 1", @import("day5.zig").allocPart1 },
+    .{ "5 2", @import("day5.zig").allocPart2 },
 });
 
 pub fn main() !void {
@@ -38,8 +37,7 @@ pub fn main() !void {
     };
     defer allocator.free(input);
 
-    const callableKey = try std.fmt.allocPrint(allocator, "{} {}", exercise);
-    if (exercises.get(callableKey)) |callable| {
+    if (exercises.get(try std.fmt.allocPrint(allocator, "{} {}", exercise))) |callable| {
         const result = try callable(allocator, input);
         defer allocator.free(result);
 
@@ -53,16 +51,16 @@ pub fn main() !void {
     }
 }
 
-fn getExercise(args: [][:0]u8) !AocExcercise {
-    if (args.len < 3) return AocError.InvalidUsage;
+fn getExercise(args: [][:0]u8) !struct { day: u8, part: u8 } {
+    if (args.len < 3) return error.WrongNumberOfArgs;
 
     const day = try std.fmt.parseUnsigned(u8, args[1], 10);
-    if (day > 25) return AocError.InvalidUsage;
+    if (day > 25) return error.InvalidDay;
 
     const part = try std.fmt.parseUnsigned(u8, args[2], 10);
-    if (part != 1 and part != 2) return AocError.InvalidUsage;
+    if (part != 1 and part != 2) return error.InvalidPart;
 
-    return AocExcercise{ .day = day, .part = part };
+    return .{ .day = day, .part = part };
 }
 
 fn allocDayInput(allocator: std.mem.Allocator, day: u8) ![]const u8 {
