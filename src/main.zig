@@ -1,13 +1,20 @@
 const std = @import("std");
 
-const day0 = @import("day0.zig");
-const day1 = @import("day1.zig");
-const day2 = @import("day2.zig");
-const day3 = @import("day3.zig");
-const day4 = @import("day4.zig");
-
 const AocExcercise = struct { day: u8, part: u8 };
 const AocError = error{InvalidUsage};
+
+const exercises = std.ComptimeStringMap(*const fn (std.mem.Allocator, []const u8) anyerror![]const u8, .{
+    .{ "0 1", @import("day0.zig").allocPart1 },
+    .{ "0 2", @import("day0.zig").allocPart2 },
+    .{ "1 1", @import("day1.zig").allocPart1 },
+    .{ "1 2", @import("day1.zig").allocPart2 },
+    .{ "2 1", @import("day2.zig").allocPart1 },
+    .{ "2 2", @import("day2.zig").allocPart2 },
+    .{ "3 1", @import("day3.zig").allocPart1 },
+    .{ "3 2", @import("day3.zig").allocPart2 },
+    .{ "4 1", @import("day4.zig").allocPart1 },
+    .{ "4 2", @import("day4.zig").allocPart2 },
+});
 
 pub fn main() !void {
     const allocator = std.heap.c_allocator;
@@ -31,48 +38,19 @@ pub fn main() !void {
     };
     defer allocator.free(input);
 
-    const result = switch (exercise.day) {
-        0 => switch (exercise.part) {
-            1 => day0.allocPart1(allocator, input),
-            2 => day0.allocPart2(allocator, input),
-            else => unreachable,
-        },
-        1 => switch (exercise.part) {
-            1 => day1.allocPart1(allocator, input),
-            2 => day1.allocPart2(allocator, input),
-            else => unreachable,
-        },
-        2 => switch (exercise.part) {
-            1 => day2.allocPart1(allocator, input),
-            2 => day2.allocPart2(allocator, input),
-            else => unreachable,
-        },
-        3 => switch (exercise.part) {
-            1 => day3.allocPart1(allocator, input),
-            2 => day3.allocPart2(allocator, input),
-            else => unreachable,
-        },
-        4 => switch (exercise.part) {
-            1 => day4.allocPart1(allocator, input),
-            2 => day4.allocPart2(allocator, input),
-            else => unreachable,
-        },
-        else => {
-            const stderr = std.io.getStdErr().writer();
-            stderr.print("Sorry, day {} part {} isn't implemented yet\n", exercise) catch {};
+    const callableKey = try std.fmt.allocPrint(allocator, "{} {}", exercise);
+    if (exercises.get(callableKey)) |callable| {
+        const result = try callable(allocator, input);
+        defer allocator.free(result);
 
-            std.process.exit(1);
-        },
-    } catch {
+        const stdout = std.io.getStdOut().writer();
+        stdout.print("{s}\n", .{result}) catch {};
+    } else {
         const stderr = std.io.getStdErr().writer();
-        stderr.print("Error running, day {} part {}\n", exercise) catch {};
+        stderr.print("Sorry, day {} part {} isn't implemented yet\n", exercise) catch {};
 
         std.process.exit(1);
-    };
-    defer allocator.free(result);
-
-    const stdout = std.io.getStdOut().writer();
-    stdout.print("{s}\n", .{result}) catch {};
+    }
 }
 
 fn getExercise(args: [][:0]u8) !AocExcercise {
