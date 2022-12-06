@@ -13,6 +13,8 @@ const exercises = std.ComptimeStringMap(*const fn (std.mem.Allocator, []const u8
     .{ "4 2", @import("day4.zig").allocPart2 },
     .{ "5 1", @import("day5.zig").allocPart1 },
     .{ "5 2", @import("day5.zig").allocPart2 },
+    .{ "6 1", @import("day6.zig").allocPart1 },
+    .{ "6 2", @import("day6.zig").allocPart2 },
 });
 
 pub fn main() !void {
