@@ -15,10 +15,13 @@ const exercises = std.ComptimeStringMap(*const fn (std.mem.Allocator, []const u8
     .{ "5 2", @import("day5.zig").allocPart2 },
     .{ "6 1", @import("day6.zig").allocPart1 },
     .{ "6 2", @import("day6.zig").allocPart2 },
+    .{ "7 1", @import("day7.zig").allocPart1 },
+    .{ "7 2", @import("day7.zig").allocPart2 },
 });
 
 pub fn main() !void {
-    const allocator = std.heap.c_allocator;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
 
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
